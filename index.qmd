@@ -231,7 +231,7 @@ comm_lnorm2 %>%
 > C'est logique, car la communauté bleue (sigma=2) a une variabilité plus grande donc beaucoup plus d'espèces rares.
 > La communauté rouge a une moins grande variabilité : les espèces ont des abondances similaires.
 
-## Pielou (1972) 
+## Pielou (1972)
 
 *L'objectif de cette dernière partie est de redécouvrir et de moderniser les résultats de @pielou1972. Les données sont des relevés d'abondances de pucerons du genre* Dactynotus *sur des plantes du genre* Solidago *(Asteraceae), considérées comme leurs habitats possibles. La diversité de chacun des* Solidago *est celle des espèces de pucerons qu'il abrite.*
 
@@ -262,8 +262,12 @@ pielou_1972
 ```
 
 > Combien y a–t-il d'espèces de pucerons ?
+>
+> 10
 
 > Combien y a–t-il de plantes différentes ?
+>
+> 12
 
 *Etant donné le protocole expérimental (toutes les espèces étudiées sont dans les données, il n'y a pas d'espèce non observée), la diversité sera toujours calculée au niveau de l'échantillon: l'argument* `estimator = "naive"` *sera utilisé systématiquement.*
 
@@ -271,25 +275,72 @@ pielou_1972
 
 > Compter le nombre d'espèces de pucerons sur chaque plante.
 
+```{r}
+richesse <- tibble(
+  site = pielou_1972$site,
+  richesse = rowSums(as.data.frame(pielou_1972)[, -(1:2)] > 0))
+richesse
+```
+
 > Quelle est la richesse maximale ?
+
+```{r}
+max(richesse$richesse)
+```
 
 > Calculer la diversité (pas l'entropie) de Simpson.
 
+```{r}
+div_hill(pielou_1972, q = 2, estimator = "naive")
+```
+
 > Quelle est la plante la plus diverse au sens de Simpson ?
+>
+> S_juncea
 
 > Tracer les profils de diversité de tous les *Solidago*.
 
+```{r}
+pielou_1972 %>% 
+  profile_hill() %>% 
+  autoplot()
+```
+
 > Quelle est la plante apparemment la plus diverse, quel que soit l'ordre de diversité ?
+>
+> S_juncea
 
 > Vérifiez si les courbes se croisent pour $q>2$.
 
+```{r}
+pielou_1972 %>% 
+  profile_hill(orders = seq(0, 5, by = 0.1)) %>% 
+  autoplot()
+```
+
+Les courbes ne se recroisent pas après q=2.
+
 > Deux profils sont plats.
 > Expliquez pourquoi.
+>
+> Ces profils correspondent à des sites parfaitement équitables : les plantes ont le même nombre d'individu pour chaque espèce présente.
 
 > Décomposez la diversité.
 > Résumez cette décomposition en une ou quelques phrases.
 > Attention : en raison d'un bug dans la version publiée du package divent, vous ne pouvez pas utiliser l'argument `estimator = "naive"` dans la fonction `div_part()`.
 > Faites la décomposition de la diversité asymptotique avec l'estimateur par défaut.
+
+```{r}
+div_part(pielou_1972, q=0)
+```
+
+partitionnement multiplicatif
+
+gamma = diversité globale de toutes les plantes\
+alpha = diversité moyenne de chaque plante (1 moyenne pour toutes)\
+beta = gamma/alpha = à quel point la diversité moyenne de chaque plante est différente de la diversité totale = nombre de hill = nombre effectif de plantes
+
+Ici on voit que les sites sont très similaires car beta est très petit par rapport au nombre réel de plantes (2 VS 12).
 
 ### Largeur de niches
 
@@ -303,12 +354,10 @@ pielou_1972
 # Read the file
 read_csv("data/Pielou1972.csv") %>% 
   # Replace missing values by zeros
-  mutate(across(everything(), ~ replace_na(.x, 0))) ->
-  pielou_raw
+  mutate(across(everything(), ~ replace_na(.x, 0))) ->  pielou_raw
 # Save the names of the Soledagos
 pielou_raw %>% 
-  pull(site) ->
-  pielou_habitats
+  pull(site) ->  pielou_habitats
 # Make a matrix
 pielou_raw %>%
   # Remove the site
@@ -316,8 +365,7 @@ pielou_raw %>%
   # Make it a matrix
   as.matrix() %>% 
   # Transpose the matrix
-  t() ->
-  pielou_niches.matrix
+  t() ->  pielou_niches.matrix
 # Add the column names
 colnames(pielou_niches.matrix) <- pielou_habitats
 pielou_niches.matrix %>% 
@@ -333,15 +381,37 @@ pielou_niches
 *Le nombre d'habitats occupés par chaque espèce de puceron peut être compté avec les fonctions de calcul de la diversité habituelles, appliquées à ce jeu de données inhabituel :*
 
 > Quelle est l'espèce de pucerons la plus généraliste ?
+
+```{r}
+niches <- div_richness(pielou_niches, estimator = "naive")
+niches
+```
+
+L'espèce la plus généraliste est D_pieloui.
+
 > Quelle proportion des habitats occupe-t-elle ?
+>
+> Elle occupe 10/12=83% des niches.
 
 > Quelle est l'espèce la plus spécialiste ?
+>
+> L'espèce la plus spécialiste est D_solirostratus (1 niche occupée).
 
 > Tracez les profils de diversité des pucerons et faites le lien entre le nombre effectif de *Soledago* et la largeur de niche.
+
+```{r}
+pielou_niches %>% 
+  profile_hill() %>% 
+  autoplot()
+```
+
+Le nombre effectif de Soledago est bien inférieur à la largeur moyenne des niches occupées par les pucerons -\> les habitats ne sont pas complètement différents et une partie du filtre abiotique est redondant ?
 
 > Pielou s'intéresse seulement à l'entropie de Shannon dans son article, sous une forme archaïque appelée formule de Brillouin, ce qui rend l'article très difficile à lire.
 > @Levins1968 avait le premier proposé de mesurer la largeur de niche de cette façon, en proposant deux métriques : $-\sum_i{p_i \log(p_i)}$ et $\sum_i{\frac{1}{p_i^2}}$ où $p_i$ est la probabilité qu'un puceron se trouve dans l'habitat $i$.
 > Identifiez ces deux métriques.
+>
+> log(1/p_i) = -log(p_i) donc la première métrique correspond à la formule de l'entropie de Shannon et la deuxième ressemble à l'entropie de Simpson ?
 
 ### Chevauchement des niches
 
@@ -349,3 +419,6 @@ pielou_niches
 
 > Quelle est la mesure qui rend compte du chevauchement des niches ?
 > Donnez sa valeur pour q = 1.
+>
+> C'est le nombre de hill = le nombre effectif de niches = diversité beta\
+> D_ordre2 = exp_déformée_d'ordre2(²H)
