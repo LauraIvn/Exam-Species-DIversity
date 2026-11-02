@@ -59,7 +59,23 @@ Ne modifiez pas le projet après la fin de l'examen.
 - $S_{J2} = S_{>0} + 2 S_1 - S_2$
 - $S_{J3} = S_{>0} + 3 S_1 - 3 S_2 + S_3$
 
-> Estimez rapidement la richesse asymptotique de la forêt en utilisant les estimateurs jackknife et les règles de @Brose2003.
+Estimez rapidement la richesse asymptotique de la forêt en utilisant les estimateurs jackknife et les règles de @Brose2003.
+
+Sample coverage :
+
+$C_A = 100/(100+20)=0.8333333$
+
+J1 valide : S_A = 100+20=120
+
+$C_B=80/110=0.7272727$
+
+J1 pas valide car sample coverage \< 74%\
+On utilise J2: S_B = 80+2\*30-20=120
+
+$C_C=150/(110+150)=0.5769231$
+
+On utilise J2 car 50% \< sample coverage \< 74%\
+S_C = 150+2\*110-30=340
 
 ## Diversité phylogénétique
 
@@ -77,17 +93,32 @@ tree_3sp(0.5)
 ```
 
 > Quelle est la diversité phylogénétique d'ordre 0 (PD de Faith) d'une communauté contenant les trois espèces, dont l'arbre phylogénétique est celui de la figure ?
+>
+> 3
 
 > Quelle est l'étendue possible des valeurs de `h` ?
+>
+> 0:1
 
 > Quel est l'effet de `h` sur la valeur de PD ?
+>
+> Si h augmente alors l'entropie et la diversité aussi (les espèces A et B se sont séparées il y a plus longtemps : elles sont donc plus différentes phylogénétiquement)
 
 > Ecrivez la valeur de PD en fonction de \`h\`.
+>
+> Pour cet arbre, PD = 1+h+(1-h)
 
 > Quel est la richesse (taxonomique, pas phylogénétique) de la communauté ?
 > Expliquez comment $h$ permet de prendre en compte la proximité entre les espèces B et A.
+>
+> Richesse = 3\
+> h petit : A et B similaires\
+> h grand : A et B dissimilaires
 
 > Si les botanistes sont en désaccord sur la synonymie ou non des espèces B et A et qu'une phylogénie montre que leur distance $h$ est faible, proposez une méthode pour les mettre d'accord.
+>
+> On calcule le nombre effectif d'espèces et on voit s'il se rapproche de l'observation réelle ?
+> Si non, alors A et B sont confondus ?
 
 ## Distribution lognormale
 
