@@ -94,19 +94,21 @@ tree_3sp(0.5)
 
 > Quelle est la diversité phylogénétique d'ordre 0 (PD de Faith) d'une communauté contenant les trois espèces, dont l'arbre phylogénétique est celui de la figure ?
 >
-> 3
+> PD=2.5
 
 > Quelle est l'étendue possible des valeurs de `h` ?
 >
-> 0:1
+> 0:1\
+> h=0 : tous les espèces ont 1 ancêtre commun\
+> h=1 : toutes les espèces sont phylogénétiquement différentes
 
 > Quel est l'effet de `h` sur la valeur de PD ?
 >
-> Si h augmente alors l'entropie et la diversité aussi (les espèces A et B se sont séparées il y a plus longtemps : elles sont donc plus différentes phylogénétiquement)
+> Si h augmente alors l'entropie et la diversité aussi (les espèces A et B se sont séparées il y a plus longtemps : elles sont donc plus différentes phylogénétiquement).
 
 > Ecrivez la valeur de PD en fonction de \`h\`.
 >
-> Pour cet arbre, PD = 1+h+(1-h)
+> Pour cet arbre, PD = 1+2h+(1-h)
 
 > Quel est la richesse (taxonomique, pas phylogénétique) de la communauté ?
 > Expliquez comment $h$ permet de prendre en compte la proximité entre les espèces B et A.
@@ -118,7 +120,7 @@ tree_3sp(0.5)
 > Si les botanistes sont en désaccord sur la synonymie ou non des espèces B et A et qu'une phylogénie montre que leur distance $h$ est faible, proposez une méthode pour les mettre d'accord.
 >
 > On calcule le nombre effectif d'espèces et on voit s'il se rapproche de l'observation réelle ?
-> Si non, alors A et B sont confondus ?
+> Si le nombre effectif d'espèce obtenu est égal à 2 alors A et B sont confondus.
 
 ## Distribution lognormale
 
@@ -127,7 +129,7 @@ tree_3sp(0.5)
 ```{r}
 library("tidyverse")
 library("divent")
-# Set the random seed for reproducibility
+# Set the random seed for reproductibility
 set.seed(973)
 # Size and richness
 the_size <- 1E6
@@ -163,17 +165,73 @@ autoplot(comm_lnorm)
 
 > Quelle est la richesse des communautés observées ?
 > Quel est l'abondance de l'espèce la plus rare (approximativement, lue sur le graphique) comparativement au nombre d'arbres total ?
+>
+> Richesse = 100 espèces
+>
+> Abondance de l'espèce la plus rare :\
+> A_sigma1 = 1000 individus\
+> donc 0.001% de la communauté
+>
+> A_sigma2 = 5 individus\
+> donc 0.000005% de la communauté
 
 > Qu'observe-t-on pour un échantillon de taille raisonnable, disons 6,25ha avec 600 arbres / ha ?
 > Faites la figure.
 > Attention à ne pas détruire la variable `comm_lnorm` en réutilisant le code.
 
+```{r}
+# Set the random seed for reproductibility
+set.seed(973)
+# Size and richness
+the_size <- 3750
+the_richness <- 100
+# Draw the first community
+rcommunity(
+  1, 
+  size = the_size, 
+  species_number = the_richness, 
+  distribution = "lnorm", 
+  sd_lnorm = 1
+) %>% 
+  # Give it a name
+  mutate(site = "sigma = 1") %>% 
+  # Bind the second community data in the same tibble
+  bind_rows(
+    # Draw the second community
+    rcommunity(
+      1, 
+      size = the_size, 
+      species_number = the_richness, 
+      distribution = "lnorm", 
+      sd_lnorm = 2
+    ) %>% 
+      # Give it a name
+      mutate(site = "sigma = 2")
+  ) -> 
+  # Store the result
+  comm_lnorm2
+# Whittaker plot
+autoplot(comm_lnorm2)
+```
+
+La différence entre les deux distributions est moins grande que lorsque l'échantillon était énorme.
+
 > Tracez le profil de diversité des deux communautés
+
+```{r}
+comm_lnorm2 %>% 
+  profile_hill() %>% 
+  autoplot()
+```
 
 > Quelle est la communauté la plus diverse ?
 > Faites le lien avec la valeur de $\sigma$.
+>
+> Les deux communautés ont le même nombre d'espèce; mais la communauté rouge (sigma=1) est plus diverse car elle est plus équitable : elle a une diversité d'ordre 2 plus grande que la communauté bleue.
+> C'est logique, car la communauté bleue (sigma=2) a une variabilité plus grande donc beaucoup plus d'espèces rares.
+> La communauté rouge a une moins grande variabilité : les espèces ont des abondances similaires.
 
-## Pielou (1972)
+## Pielou (1972) 
 
 *L'objectif de cette dernière partie est de redécouvrir et de moderniser les résultats de @pielou1972. Les données sont des relevés d'abondances de pucerons du genre* Dactynotus *sur des plantes du genre* Solidago *(Asteraceae), considérées comme leurs habitats possibles. La diversité de chacun des* Solidago *est celle des espèces de pucerons qu'il abrite.*
 
