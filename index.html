@@ -476,9 +476,11 @@ dbl (10): D_nigrotuberculatus, D_nigrotibius, D_caligatus, D_pieloui, D_cana...
 </div>
 <blockquote class="blockquote">
 <p>Combien y a–t-il d’espèces de pucerons ?</p>
+<p>10</p>
 </blockquote>
 <blockquote class="blockquote">
 <p>Combien y a–t-il de plantes différentes ?</p>
+<p>12</p>
 </blockquote>
 <p><em>Etant donné le protocole expérimental (toutes les espèces étudiées sont dans les données, il n’y a pas d’espèce non observée), la diversité sera toujours calculée au niveau de l’échantillon: l’argument</em> <code>estimator = "naive"</code> <em>sera utilisé systématiquement.</em></p>
 </section>
@@ -487,30 +489,215 @@ dbl (10): D_nigrotuberculatus, D_nigrotibius, D_caligatus, D_pieloui, D_cana...
 <blockquote class="blockquote">
 <p>Compter le nombre d’espèces de pucerons sur chaque plante.</p>
 </blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>richesse <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">site =</span> pielou_1972<span class="sc">$</span>site,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">richesse =</span> <span class="fu">rowSums</span>(<span class="fu">as.data.frame</span>(pielou_1972)[, <span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)] <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>richesse</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 12 × 2
+   site           richesse
+   &lt;chr&gt;             &lt;dbl&gt;
+ 1 S_canadensis          8
+ 2 S_nemoralis           8
+ 3 S_rugosa              7
+ 4 S_juncea              8
+ 5 S_gigantea            6
+ 6 S_hispida             4
+ 7 S_squarosa            4
+ 8 S_graminifolia        5
+ 9 S_caesia              4
+10 S_ulignosa            2
+11 S_flexicaulis         2
+12 S_ohioensis           1</code></pre>
+</div>
+</div>
 <blockquote class="blockquote">
 <p>Quelle est la richesse maximale ?</p>
 </blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(richesse<span class="sc">$</span>richesse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8</code></pre>
+</div>
+</div>
 <blockquote class="blockquote">
 <p>Calculer la diversité (pas l’entropie) de Simpson.</p>
 </blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">div_hill</span>(pielou_1972, <span class="at">q =</span> <span class="dv">2</span>, <span class="at">estimator =</span> <span class="st">"naive"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 12 × 5
+   site           weight estimator      order diversity
+   &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
+ 1 S_canadensis        1 naive              2      3.52
+ 2 S_nemoralis         1 naive              2      2.76
+ 3 S_rugosa            1 naive              2      3.97
+ 4 S_juncea            1 naive              2      4.88
+ 5 S_gigantea          1 naive              2      4.77
+ 6 S_hispida           1 naive              2      2.70
+ 7 S_squarosa          1 naive              2      3.24
+ 8 S_graminifolia      1 naive              2      3.52
+ 9 S_caesia            1 naive              2      3.57
+10 S_ulignosa          1 naive              2      1.47
+11 S_flexicaulis       1 naive              2      2   
+12 S_ohioensis         1 Single Species     2      1   </code></pre>
+</div>
+</div>
 <blockquote class="blockquote">
 <p>Quelle est la plante la plus diverse au sens de Simpson ?</p>
+<p>S_juncea</p>
 </blockquote>
 <blockquote class="blockquote">
 <p>Tracer les profils de diversité de tous les <em>Solidago</em>.</p>
 </blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pielou_1972 <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">profile_hill</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 <blockquote class="blockquote">
 <p>Quelle est la plante apparemment la plus diverse, quel que soit l’ordre de diversité ?</p>
+<p>S_juncea</p>
 </blockquote>
 <blockquote class="blockquote">
 <p>Vérifiez si les courbes se croisent pour <span class="math inline">\(q&gt;2\)</span>.</p>
 </blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>pielou_1972 <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">profile_hill</span>(<span class="at">orders =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">by =</span> <span class="fl">0.1</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Les courbes ne se recroisent pas après q=2.</p>
 <blockquote class="blockquote">
 <p>Deux profils sont plats. Expliquez pourquoi.</p>
+<p>Ces profils correspondent à des sites parfaitement équitables : les plantes ont le même nombre d’individu pour chaque espèce présente.</p>
 </blockquote>
 <blockquote class="blockquote">
 <p>Décomposez la diversité. Résumez cette décomposition en une ou quelques phrases. Attention : en raison d’un bug dans la version publiée du package divent, vous ne pouvez pas utiliser l’argument <code>estimator = "naive"</code> dans la fonction <code>div_part()</code>. Faites la décomposition de la diversité asymptotique avec l’estimateur par défaut.</p>
 </blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">div_part</span>(pielou_1972, <span class="at">q=</span><span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Sample coverage is 0, most estimators will return `NaN`.
+! Sample coverage is 0, most estimators will return `NaN`.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 15 × 6
+   site           scale     estimator        order diversity weight
+   &lt;chr&gt;          &lt;chr&gt;     &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;
+ 1 Metacommunity  gamma     "UnveilJ"            0     11        12
+ 2 Metacommunity  beta      ""                   0      1.67     NA
+ 3 Metacommunity  alpha     ""                   0      6.58     NA
+ 4 S_canadensis   community "UnveilJ"            0      8         1
+ 5 S_nemoralis    community "UnveilJ"            0     10         1
+ 6 S_rugosa       community "UnveilJ"            0      7         1
+ 7 S_juncea       community "UnveilJ"            0     18         1
+ 8 S_gigantea     community "UnveilJ"            0      7         1
+ 9 S_hispida      community "UnveilJ"            0      4         1
+10 S_squarosa     community "UnveilJ"            0      5         1
+11 S_graminifolia community "UnveilJ"            0      8         1
+12 S_caesia       community "UnveilJ"            0      7         1
+13 S_ulignosa     community "UnveilJ"            0      2         1
+14 S_flexicaulis  community "UnveilJ"            0      2         1
+15 S_ohioensis    community "Single Species"     0      1         1</code></pre>
+</div>
+</div>
+<p>partitionnement multiplicatif</p>
+<p>gamma = diversité globale de toutes les plantes<br>
+alpha = diversité moyenne de chaque plante (1 moyenne pour toutes)<br>
+beta = gamma/alpha = à quel point la diversité moyenne de chaque plante est différente de la diversité totale = nombre de hill = nombre effectif de plantes</p>
+<p>Ici on voit que les sites sont très similaires car beta est très petit par rapport au nombre réel de plantes (2 VS 12).</p>
 </section>
 <section id="largeur-de-niches" class="level3" data-number="2.4.3">
 <h3 data-number="2.4.3" class="anchored" data-anchor-id="largeur-de-niches"><span class="header-section-number">2.4.3</span> Largeur de niches</h3>
@@ -518,11 +705,10 @@ dbl (10): D_nigrotuberculatus, D_nigrotibius, D_caligatus, D_pieloui, D_cana...
 <p><em>En considérant que chaque</em> Solidago <em>constitue un habitat distinct pour une espèce de puceron, le nombre d’habitat occupés est un proxy de la taille de sa niche. Un puceron généraliste occupera plus d’habitats (autrement dit, une niche plus large) qu’un puceron spécialiste. La largeur de niche de chaque espèce de puceron est donc définie dans un premier temps par le nombre d’habitats différents qu’il occupe.</em></p>
 <p><em>Les données doivent être organisées différemment avec les espèces de pucerons en ligne et les habitats en colonnes, ce qui nécessite de passer par une matrice de données et de la transposer. Comme le code est un peu laborieux, il est donné ci-dessous.</em></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the file</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"data/Pielou1972.csv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Replace missing values by zeros</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> <span class="fu">replace_na</span>(.x, <span class="dv">0</span>))) <span class="ot">-&gt;</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  pielou_raw</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the file</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"data/Pielou1972.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Replace missing values by zeros</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> <span class="fu">replace_na</span>(.x, <span class="dv">0</span>))) <span class="ot">-&gt;</span>  pielou_raw</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 12 Columns: 11
 ── Column specification ────────────────────────────────────────────────────────
@@ -533,29 +719,27 @@ dbl (10): D_nigrotuberculatus, D_nigrotibius, D_caligatus, D_pieloui, D_cana...
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the names of the Soledagos</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>pielou_raw <span class="sc">%&gt;%</span> </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(site) <span class="ot">-&gt;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  pielou_habitats</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Make a matrix</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>pielou_raw <span class="sc">%&gt;%</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the site</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>site) <span class="sc">%&gt;%</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make it a matrix</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Transpose the matrix</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="ot">-&gt;</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  pielou_niches.matrix</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the column names</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(pielou_niches.matrix) <span class="ot">&lt;-</span> pielou_habitats</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>pielou_niches.matrix <span class="sc">%&gt;%</span> </span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make an abundances object</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_abundances</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set equal weights</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weight =</span> <span class="dv">1</span>) <span class="ot">-&gt;</span></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  pielou_niches</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Display it</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>pielou_niches</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the names of the Soledagos</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>pielou_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(site) <span class="ot">-&gt;</span>  pielou_habitats</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Make a matrix</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>pielou_raw <span class="sc">%&gt;%</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the site</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>site) <span class="sc">%&gt;%</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make it a matrix</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Transpose the matrix</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="ot">-&gt;</span>  pielou_niches.matrix</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the column names</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(pielou_niches.matrix) <span class="ot">&lt;-</span> pielou_habitats</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>pielou_niches.matrix <span class="sc">%&gt;%</span> </span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make an abundances object</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_abundances</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set equal weights</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weight =</span> <span class="dv">1</span>) <span class="ot">-&gt;</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>  pielou_niches</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Display it</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>pielou_niches</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 14
    site   weight S_canadensis S_nemoralis S_rugosa S_juncea S_gigantea S_hispida
@@ -576,16 +760,55 @@ dbl (10): D_nigrotuberculatus, D_nigrotibius, D_caligatus, D_pieloui, D_cana...
 </div>
 <p><em>Le nombre d’habitats occupés par chaque espèce de puceron peut être compté avec les fonctions de calcul de la diversité habituelles, appliquées à ce jeu de données inhabituel :</em></p>
 <blockquote class="blockquote">
-<p>Quelle est l’espèce de pucerons la plus généraliste ? Quelle proportion des habitats occupe-t-elle ?</p>
+<p>Quelle est l’espèce de pucerons la plus généraliste ?</p>
+</blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>niches <span class="ot">&lt;-</span> <span class="fu">div_richness</span>(pielou_niches, <span class="at">estimator =</span> <span class="st">"naive"</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>niches</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+   site                weight estimator      order diversity
+   &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
+ 1 D_nigrotuberculatus      1 naive              0         9
+ 2 D_nigrotibius            1 naive              0         9
+ 3 D_caligatus              1 naive              0         6
+ 4 D_pieloui                1 naive              0        10
+ 5 D_canadensis             1 naive              0         6
+ 6 D_gravicornis            1 naive              0         6
+ 7 D_lanceolatus            1 naive              0         7
+ 8 D_macgillivrayae         1 naive              0         3
+ 9 D_erigeronensis          1 naive              0         2
+10 D_solirostratus          1 Single Species     0         1</code></pre>
+</div>
+</div>
+<p>L’espèce la plus généraliste est D_pieloui.</p>
+<blockquote class="blockquote">
+<p>Quelle proportion des habitats occupe-t-elle ?</p>
+<p>Elle occupe 10/12=83% des niches.</p>
 </blockquote>
 <blockquote class="blockquote">
 <p>Quelle est l’espèce la plus spécialiste ?</p>
+<p>L’espèce la plus spécialiste est D_solirostratus (1 niche occupée).</p>
 </blockquote>
 <blockquote class="blockquote">
 <p>Tracez les profils de diversité des pucerons et faites le lien entre le nombre effectif de <em>Soledago</em> et la largeur de niche.</p>
 </blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>pielou_niches <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">profile_hill</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Le nombre effectif de Soledago est bien inférieur à la largeur moyenne des niches occupées par les pucerons -&gt; les habitats ne sont pas complètement différents et une partie du filtre abiotique est redondant ?</p>
 <blockquote class="blockquote">
 <p>Pielou s’intéresse seulement à l’entropie de Shannon dans son article, sous une forme archaïque appelée formule de Brillouin, ce qui rend l’article très difficile à lire. <span class="citation" data-cites="Levins1968">Levins (<a href="#ref-Levins1968" role="doc-biblioref">1968</a>)</span> avait le premier proposé de mesurer la largeur de niche de cette façon, en proposant deux métriques : <span class="math inline">\(-\sum_i{p_i \log(p_i)}\)</span> et <span class="math inline">\(\sum_i{\frac{1}{p_i^2}}\)</span> où <span class="math inline">\(p_i\)</span> est la probabilité qu’un puceron se trouve dans l’habitat <span class="math inline">\(i\)</span>. Identifiez ces deux métriques.</p>
+<p>log(1/p_i) = -log(p_i) donc la première métrique correspond à la formule de l’entropie de Shannon et la deuxième ressemble à l’entropie de Simpson ?</p>
 </blockquote>
 </section>
 <section id="chevauchement-des-niches" class="level3" data-number="2.4.4">
@@ -593,6 +816,8 @@ dbl (10): D_nigrotuberculatus, D_nigrotibius, D_caligatus, D_pieloui, D_cana...
 <p><em>Pielou veut évaluer le chevauchement des niches en plus de leur largeur. Le raisonnement est plus clair avec les nombres de Hill. Si les niches ne se chevauchent pas du tout, on trouve une seule espèce par habitat à condition bien sûr qu’il y ait moins d’espèces que d’habitats. A l’inverse, si toutes les espèces sont totalement généralistes, le nombre d’espèces par habitat est celui des espèces.</em></p>
 <blockquote class="blockquote">
 <p>Quelle est la mesure qui rend compte du chevauchement des niches ? Donnez sa valeur pour q = 1.</p>
+<p>C’est le nombre de hill = le nombre effectif de niches = diversité beta<br>
+D_ordre2 = exp_déformée_d’ordre2(²H)</p>
 </blockquote>
 
 </section>
